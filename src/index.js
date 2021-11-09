@@ -1,4 +1,10 @@
 import pkg from "../package.json";
+import i18n from "./i18n/index.js";
+import { CategorySchema } from "./simpleSchema";
+import { registerPluginHandlerForCategory } from "./registration";
+import resolvers from "./resolvers/index.js";
+import schemas from "./schemas/index.js";
+import startup from "./startup.js";
 
 /**
  * @summary Import and call this function to add this plugin to your API.
@@ -7,8 +13,28 @@ import pkg from "../package.json";
  */
 export default async function register(app) {
   await app.registerPlugin({
-    label: "Plugin Example",
-    name: "plugin-example",
-    version: pkg.version
+    label: "Category",
+    name: "Category",
+    version: pkg.version,
+    i18n,
+    collections: {
+      CategorySchema: {
+        name: "Category",
+        indexes: [[{ createdAt: 1, _id: 1 }], [{ updatedAt: 1, _id: 1 }]],
+      },
+    },
+    functionsByType: {
+      registerPluginHandler: [registerPluginHandlerForCategory],
+      startup: [startup],
+    },
+    graphQL: {
+      resolvers,
+      schemas,
+    },
+    mutations,
+    queries,
+    simpleSchemas: {
+      CategorySchema,
+    },
   });
 }
